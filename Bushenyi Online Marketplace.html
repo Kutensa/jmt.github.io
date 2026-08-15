@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Bushenyi Online — Lowest Prices in Town</title>
+<meta name="description" content="Bushenyi Online marketplace. Lowest prices in town. Order on WhatsApp.">
+<style>
+  :root{
+    --ink:#14213D;
+    --sun:#FFB800;
+    --leaf:#0B7A55;
+    --chili:#E63946;
+    --cloud:#F7F5F0;
+    --slate:#6B7280;
+    --line:#E7E3D8;
+    --card:#FFFFFF;
+    --radius:10px;
+    --header-h:104px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cloud);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-top:var(--header-h);
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  img{max-width:100%;display:block;}
+
+  /* ---------- Sticky header ---------- */
+  header.topbar{
+    position:fixed;top:0;left:0;right:0;
+    z-index:50;
+    background:var(--ink);
+    color:#fff;
+    padding:8px 12px 10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  .brand-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .brand-left{display:flex;align-items:baseline;gap:8px;min-width:0;}
+  .brand-name{
+    font-size:19px;
+    font-weight:800;
+    letter-spacing:.2px;
+    white-space:nowrap;
+  }
+  .brand-name span{color:var(--sun);}
+  .tagline{
+    font-size:11px;
+    color:#C9CFE0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .phone-pill{
+    display:none;
+    font-size:12px;
+    color:#C9CFE0;
+    border:1px solid #2b3660;
+    padding:4px 8px;
+    border-radius:999px;
+  }
+  .wa-btn{
+    display:flex;align-items:center;gap:5px;
+    background:var(--leaf);
+    color:#fff;
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:700;
+    border:none;
+    white-space:nowrap;
+  }
+  .wa-btn svg{width:14px;height:14px;fill:#fff;}
+
+  .search-row{margin-top:8px;display:flex;gap:8px;}
+  .search-row input{
+    flex:1;
+    min-width:0;
+    background:#fff;
+    border:none;
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .search-row input:focus{outline:2px solid var(--sun);}
+  .back-btn{
+    display:none;
+    align-items:center;justify-content:center;gap:4px;
+    background:var(--sun);
+    color:var(--ink);
+    border:none;
+    border-radius:999px;
+    padding:7px 13px 7px 10px;
+    font-size:13.5px;
+    font-weight:800;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    flex-shrink:0;
+  }
+  .back-btn svg{width:16px;height:16px;color:var(--ink);}
+  .back-btn.show{display:flex;}
+  .back-btn:active{transform:scale(.95);}
+  .crumb{
+    margin-top:6px;
+    font-size:12px;
+    color:#C9CFE0;
+    white-space:nowrap;
+    overflow-x:auto;
+  }
+
+  /* ---------- Layout ---------- */
+  main{padding:10px 8px 40px;max-width:1400px;margin:0 auto;}
+  .section-title{
+    font-size:13px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--slate);
+    margin:10px 4px 8px;
+  }
+
+  /* ---------- Category grid ---------- */
+  .cat-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .cat-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    text-align:center;
+    box-shadow:0 1px 2px rgba(20,33,61,.05);
+    transition:transform .12s ease;
+  }
+  .cat-card:active{transform:scale(.97);}
+  .cat-thumb{
+    width:100%;
+    aspect-ratio:1/1;
+    background:#EFEAD9;
+    object-fit:contain;
+  }
+  .cat-label{
+    padding:7px 6px 9px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+    line-height:1.2;
+  }
+
+  /* ---------- Product grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+  }
+  @media (min-width:640px){ .grid{grid-template-columns:repeat(4,1fr);} .cat-grid{grid-template-columns:repeat(4,1fr);} }
+  @media (min-width:900px){ .grid{grid-template-columns:repeat(5,1fr);} .cat-grid{grid-template-columns:repeat(6,1fr);} }
+  @media (min-width:1200px){ .grid{grid-template-columns:repeat(6,1fr);} }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 1px 2px rgba(20,33,61,.05);
+    position:relative;
+    transition:transform .12s ease;
+  }
+  .card:active{transform:scale(.97);}
+  .card-img-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:#EFEAD9;
+    overflow:hidden;
+  }
+  .card-img-wrap img{width:100%;height:100%;object-fit:contain;background:#fff;}
+  .badge-sale{
+    position:absolute;
+    top:6px;left:-26px;
+    transform:rotate(-45deg);
+    background:var(--chili);
+    color:#fff;
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:.4px;
+    padding:2px 30px;
+    box-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .card-body{padding:7px 8px 9px;display:flex;flex-direction:column;gap:3px;flex:1;}
+  .card-name{
+    font-size:12.5px;
+    font-weight:600;
+    line-height:1.3;
+    color:var(--ink);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    min-height:2.5em;
+  }
+  .price-row{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:2px;}
+  .price-tag{
+    font-size:14px;
+    font-weight:800;
+    color:var(--ink);
+    background:var(--sun);
+    padding:1px 7px;
+    border-radius:4px 4px 4px 0;
+    line-height:1.5;
+  }
+  .price-old{
+    font-size:11px;
+    color:var(--slate);
+    text-decoration:line-through;
+  }
+  .neg-tag{
+    font-size:10px;
+    color:var(--leaf);
+    font-weight:700;
+  }
+
+  /* ---------- States ---------- */
+  .empty, .loading, .error-box{
+    text-align:center;
+    padding:40px 16px;
+    color:var(--slate);
+    font-size:14px;
+  }
+  .error-box{
+    text-align:left;
+    background:#FDEAEA;
+    border:1px solid #F3B9BC;
+    color:#7A1F26;
+    border-radius:8px;
+    padding:14px;
+    margin:10px 4px;
+  }
+  .error-box h3{margin:0 0 6px;font-size:14px;}
+  .error-box pre{
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-size:11.5px;
+    background:#fff;
+    border-radius:6px;
+    padding:8px;
+    margin:8px 0 0;
+    max-height:220px;
+    overflow:auto;
+  }
+  .spinner{
+    width:26px;height:26px;
+    border:3px solid #ddd;
+    border-top-color:var(--leaf);
+    border-radius:50%;
+    margin:0 auto 10px;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Detail view ---------- */
+  .detail{max-width:520px;margin:0 auto;padding:6px 4px;}
+  .detail-img{
+    width:100%;
+    aspect-ratio:1/1;
+    background:#EFEAD9;
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:1px solid var(--line);
+    position:relative;
+    cursor:zoom-in;
+  }
+  .detail-img img{width:100%;height:100%;object-fit:contain;background:#fff;}
+  .zoom-hint{
+    position:absolute;
+    right:8px;bottom:8px;
+    background:rgba(20,33,61,.72);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:5px 9px;
+    border-radius:999px;
+    display:flex;align-items:center;gap:4px;
+    pointer-events:none;
+  }
+  .zoom-hint svg{width:12px;height:12px;fill:#fff;}
+
+  /* ---------- Fullscreen image lightbox ---------- */
+  .lightbox-overlay{
+    position:fixed;inset:0;
+    background:rgba(10,12,20,.94);
+    display:none;
+    align-items:center;justify-content:center;
+    z-index:300;
+    padding:28px 14px;
+  }
+  .lightbox-overlay.show{display:flex;}
+  .lightbox-overlay img{
+    max-width:100%;max-height:100%;
+    object-fit:contain;
+  }
+  .lightbox-close{
+    position:absolute;
+    top:14px;right:14px;
+    width:38px;height:38px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    border:none;
+    font-size:20px;
+    line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .detail-name{font-size:19px;font-weight:800;margin:14px 4px 4px;}
+  .detail-price-row{display:flex;align-items:center;gap:10px;margin:6px 4px 4px;flex-wrap:wrap;}
+  .detail-price{
+    font-size:22px;font-weight:800;color:var(--ink);
+    background:var(--sun);padding:2px 10px;border-radius:5px 5px 5px 0;
+  }
+  .detail-old{font-size:14px;color:var(--slate);text-decoration:line-through;}
+  .detail-neg{font-size:12px;color:var(--leaf);font-weight:700;margin:2px 4px 10px;}
+  .detail-desc{
+    font-size:14px;line-height:1.55;color:#2B2B33;
+    margin:10px 4px 20px;white-space:pre-wrap;
+  }
+  .detail-wa{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--leaf);color:#fff;font-weight:700;font-size:15px;
+    padding:13px 16px;border-radius:10px;border:none;width:calc(100% - 8px);margin:0 4px;
+  }
+  .detail-wa svg{width:18px;height:18px;fill:#fff;}
+
+  .seller-card{
+    margin:18px 4px 0;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    background:var(--card);
+  }
+  .seller-poster{
+    width:100%;
+    aspect-ratio:3/1;
+    background:#EFEAD9;
+    overflow:hidden;
+  }
+  .seller-poster img{width:100%;height:100%;object-fit:contain;background:#fff;}
+  .seller-body{padding:10px 12px 12px;}
+  .seller-label{
+    font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--slate);margin-bottom:4px;
+  }
+  .seller-company{font-size:15.5px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .seller-line{font-size:13px;color:#3a3a44;margin-bottom:2px;}
+  .seller-actions{display:flex;gap:8px;margin-top:10px;}
+  .seller-actions button{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:10px 8px;border-radius:9px;border:none;font-weight:700;font-size:13px;
+  }
+  .seller-wa{background:var(--leaf);color:#fff;}
+  .seller-wa svg{width:15px;height:15px;fill:#fff;}
+  .seller-call{background:#EFEAD9;color:var(--ink);}
+
+  .footer-note{
+    text-align:center;
+    color:var(--slate);
+    font-size:11.5px;
+    padding:26px 12px 10px;
+  }
+
+  @media (min-width:640px){
+    .phone-pill{display:inline-block;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-row">
+    <div class="brand-left">
+      <button class="back-btn" id="backBtn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5 8 12l7.5 7.5"/></svg>
+        Back
+      </button>
+      <div class="brand-name">Bushenyi <span>Online</span></div>
+    </div>
+    <div class="header-actions">
+      <span class="phone-pill">0700 495 437</span>
+      <button class="wa-btn" id="waHeaderBtn">
+        <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.1L2 22l5.1-1.3c1.4.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.2-8.4 8.2z"/></svg>
+        WhatsApp
+      </button>
+    </div>
+  </div>
+  <div class="search-row" id="searchRow">
+    <input type="search" id="searchInput" placeholder="Search products…" autocomplete="off">
+  </div>
+  <div class="crumb" id="crumb"></div>
+</header>
+
+<main id="main">
+  <div class="loading" id="loading"><div class="spinner"></div>Loading Bushenyi Online…</div>
+</main>
+
+<div class="footer-note">Bushenyi Online · Lowest Prices in Town · 0700 495 437</div>
+
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = "https://eijfffonamfkkftodqjb.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamZmZm9uYW1ma2tmdG9kcWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyODk2MTEsImV4cCI6MjA3MTg2NTYxMX0.EvBkb5P16J4w19kVOuRVt7Cox-v3kWd8XkcscjgJRJo";
+  var PHONE = "256700495437";
+  var ELECTRONICS_NAME = "ELECTRONICS";
+
+  var state = {
+    items: [],
+    categories: [],
+    subcategories: [],
+    sellers: [],
+    loaded: false,
+    view: "categories",     // categories | subcategories | products | detail | search
+    activeCategory: null,
+    activeSubcategory: null,
+    activeItem: null,
+    searchTerm: ""
+  };
+
+  var mainEl = document.getElementById("main");
+  var crumbEl = document.getElementById("crumb");
+  var backBtn = document.getElementById("backBtn");
+  var searchInput = document.getElementById("searchInput");
+  var waHeaderBtn = document.getElementById("waHeaderBtn");
+  var lightboxOverlay = document.getElementById("lightboxOverlay");
+  var lightboxImg = document.getElementById("lightboxImg");
+  var lightboxClose = document.getElementById("lightboxClose");
+
+  function openLightbox(src, alt){
+    if(!src) return;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || "";
+    lightboxOverlay.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox(){
+    lightboxOverlay.classList.remove("show");
+    lightboxImg.src = "";
+    document.body.style.overflow = "";
+  }
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightboxOverlay.addEventListener("click", function(e){
+    if(e.target === lightboxOverlay) closeLightbox();
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") closeLightbox();
+  });
+
+  waHeaderBtn.addEventListener("click", function(){
+    window.open(waLink("Hello Bushenyi Online, I would like to know more about your products."), "_blank");
+  });
+
+  function waLink(text, phone){
+    return "https://wa.me/" + (phone || PHONE) + "?text=" + encodeURIComponent(text);
+  }
+
+  function esc(s){
+    if(s === null || s === undefined) return "";
+    return String(s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // ---------- Supabase fetch helper ----------
+  function loadTable(table){
+    var url = SUPABASE_URL + "/rest/v1/" + table + "?select=*";
+    return fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: "Bearer " + SUPABASE_ANON_KEY
+      }
+    }).then(function(res){
+      return res.text().then(function(bodyText){
+        if(!res.ok){
+          var err = new Error("Supabase error loading " + table);
+          err.status = res.status;
+          err.body = bodyText;
+          err.table = table;
+          throw err;
+        }
+        try{
+          return JSON.parse(bodyText);
+        }catch(e){
+          var perr = new Error("Could not parse response for " + table);
+          perr.status = res.status;
+          perr.body = bodyText;
+          perr.table = table;
+          throw perr;
+        }
+      });
+    });
+  }
+
+  function fieldValue(obj, names){
+    for(var i=0;i<names.length;i++){
+      if(obj[names[i]] !== undefined && obj[names[i]] !== null && obj[names[i]] !== "") return obj[names[i]];
+    }
+    return null;
+  }
+
+  function itemId(it){ return fieldValue(it, ["id","ID"]); }
+  function itemName(it){ return fieldValue(it, ["NAME"]) || "Unnamed item"; }
+  function itemDesc(it){ return fieldValue(it, ["DESCRIPTION"]) || ""; }
+  function itemImage(it){ return fieldValue(it, ["URL"]); }
+  function itemSubcategory(it){ return fieldValue(it, ["SUBCATEGORY"]); }
+  function cleanPriceText(v){
+    if(v === null || v === undefined) return null;
+    var s = String(v).trim();
+    if(s === "" || s.toLowerCase() === "null") return null;
+    return s;
+  }
+  function itemPrice(it){ return cleanPriceText(fieldValue(it, ["PRICE"])); }
+  function itemDiscounted(it){ return cleanPriceText(fieldValue(it, ["DISCOUNTED PRICE","DISCOUNTED_PRICE"])); }
+  function itemOwner(it){ return fieldValue(it, ["OWNER"]); }
+  function itemNegotiable(it){
+    var v = fieldValue(it, ["NEGOTIABLE"]);
+    if(!v) return false;
+    var s = String(v).trim().toLowerCase();
+    return s === "true" || s === "yes" || s === "y" || s === "1";
+  }
+
+  function catName(c){ return fieldValue(c, ["CATEGORY"]) || ""; }
+  function catUrl(c){ return fieldValue(c, ["URL"]); }
+  function catPosition(c){ var p = fieldValue(c, ["POSITION"]); var n = parseFloat(p); return isNaN(n) ? 999999 : n; }
+
+  function subCatCategory(s){ return fieldValue(s, ["CATEGORY"]) || ""; }
+  function subCatName(s){ return fieldValue(s, ["SUBCATEGORY"]) || ""; }
+  function subCatUrl(s){ return fieldValue(s, ["URL"]); }
+
+  function sellerPhoneId(s){ return fieldValue(s, ["phone_id"]); }
+  function sellerCompany(s){ return fieldValue(s, ["company"]); }
+  function sellerAddress(s){ return fieldValue(s, ["address"]); }
+  function sellerTelephone(s){ return fieldValue(s, ["telephone"]); }
+  function sellerPoster(s){ return fieldValue(s, ["url"]); }
+
+  function findSeller(ownerId){
+    if(ownerId === null || ownerId === undefined) return null;
+    for(var i=0;i<state.sellers.length;i++){
+      var pid = sellerPhoneId(state.sellers[i]);
+      if(pid === ownerId) return state.sellers[i];
+    }
+    return null;
+  }
+
+  // Normalizes a Ugandan-style local number (e.g. 0700495437) into wa.me format (256700495437)
+  function normalizePhone(raw){
+    if(!raw) return null;
+    var digits = String(raw).replace(/\D/g,"");
+    if(digits.length === 0) return null;
+    if(digits.charAt(0) === "0") digits = "256" + digits.substring(1);
+    else if(digits.substring(0,3) !== "256" && digits.length <= 9) digits = "256" + digits;
+    return digits;
+  }
+
+  // ---------- Placeholder image ----------
+  var PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#EFEAD9"/><text x="50%" y="50%" font-family="sans-serif" font-size="14" fill="#B9AF95" text-anchor="middle" dy=".3em">No image</text></svg>'
+  );
+
+  function imgTag(url, alt, cls){
+    var safeUrl = url ? esc(url) : PLACEHOLDER;
+    return '<img loading="lazy" src="'+safeUrl+'" alt="'+esc(alt)+'" class="'+(cls||"")+'" onerror="this.onerror=null;this.src=\''+PLACEHOLDER+'\';">';
+  }
+
+  // ---------- Render: loading / error ----------
+  function renderLoading(){
+    mainEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading Bushenyi Online…</div>';
+  }
+
+  function renderError(err){
+    var status = err.status !== undefined ? err.status : "network error";
+    var body = err.body !== undefined ? err.body : (err.message || String(err));
+    var table = err.table ? (" (" + err.table + ")") : "";
+    mainEl.innerHTML =
+      '<div class="error-box">' +
+        '<h3>Could not load data from Supabase' + esc(table) + '</h3>' +
+        '<div>HTTP status: ' + esc(status) + '</div>' +
+        '<pre>' + esc(body) + '</pre>' +
+        '<div style="margin-top:10px;"><button class="wa-btn" style="background:#7A1F26;" onclick="location.reload()">Retry</button></div>' +
+      '</div>';
+  }
+
+  // ---------- Crumb / back button ----------
+  function updateChrome(){
+    var parts = [];
+    if(state.view !== "categories") parts.push('<a data-nav="home">Home</a>');
+    if(state.view === "subcategories"){
+      parts.push(esc(state.activeCategory));
+    }
+    if(state.view === "products"){
+      if(state.activeSubcategory && state.activeSubcategory !== state.activeCategory){
+        parts.push('<a data-nav="subcats">'+esc(state.activeCategory)+'</a>');
+        parts.push(esc(state.activeSubcategory));
+      } else {
+        parts.push(esc(state.activeCategory));
+      }
+    }
+    if(state.view === "detail"){
+      parts.push(esc(itemName(state.activeItem)));
+    }
+    if(state.view === "search"){
+      parts.push('Search: "' + esc(state.searchTerm) + '"');
+    }
+    crumbEl.innerHTML = parts.join(' &nbsp;›&nbsp; ');
+    crumbEl.querySelectorAll('a[data-nav]').forEach(function(a){
+      a.addEventListener('click', function(){
+        var nav = a.getAttribute('data-nav');
+        if(nav === 'home') goHome();
+        if(nav === 'subcats') openCategory(state.activeCategory);
+      });
+    });
+    backBtn.classList.toggle('show', state.view !== 'categories');
+  }
+
+  backBtn.addEventListener('click', function(){
+    // Route through the same history mechanism as the phone's hardware/browser back button
+    history.back();
+  });
+
+  // ---------- Navigation ----------
+  // Single source of truth: every navigation change goes through applyState().
+  // applyState() renders the view AND (optionally) pushes a history entry, so that
+  // the phone's hardware back button (which fires 'popstate') reproduces exactly
+  // the same in-app back behavior as the visible Back button.
+  function applyState(data, push){
+    state.view = data.view;
+    state.activeCategory = data.category || null;
+    state.activeSubcategory = data.subcategory || null;
+    state.searchTerm = data.searchTerm || "";
+    if(data.view === "detail"){
+      var found = null;
+      for(var i=0;i<state.items.length;i++){
+        if(String(itemId(state.items[i])) === String(data.itemId)){ found = state.items[i]; break; }
+      }
+      state.activeItem = found;
+      if(!found){ applyState({view:"categories"}, push); return; }
+    } else {
+      state.activeItem = null;
+    }
+
+    if(state.view === "search") searchInput.value = state.searchTerm;
+
+    renderCurrentView();
+    updateChrome();
+    window.scrollTo(0,0);
+
+    if(push) history.pushState(data, "", "#" + data.view);
+  }
+
+  function renderCurrentView(){
+    if(state.view === "categories"){
+      renderCategories();
+    } else if(state.view === "subcategories"){
+      var subs = state.subcategories.filter(function(s){
+        return subCatCategory(s).trim().toLowerCase() === String(state.activeCategory).trim().toLowerCase();
+      });
+      renderSubcategories(subs);
+    } else if(state.view === "products"){
+      var products = state.items.filter(function(it){
+        return String(itemSubcategory(it) || "").trim().toLowerCase() === String(state.activeSubcategory).trim().toLowerCase();
+      });
+      renderProductGrid(products, state.activeSubcategory);
+    } else if(state.view === "detail"){
+      renderDetail(state.activeItem);
+    } else if(state.view === "search"){
+      renderSearch(state.searchTerm);
+    }
+  }
+
+  function goHome(){
+    applyState({ view: "categories" }, true);
+  }
+
+  function isElectronics(name){
+    return String(name || "").trim().toLowerCase() === ELECTRONICS_NAME.toLowerCase();
+  }
+
+  function openCategory(categoryName){
+    if(isElectronics(categoryName)){
+      applyState({ view: "subcategories", category: categoryName }, true);
+    } else {
+      openSubcategoryProducts(categoryName, categoryName);
+    }
+  }
+
+  function openSubcategoryProducts(categoryName, subcategoryName){
+    applyState({ view: "products", category: categoryName, subcategory: subcategoryName }, true);
+  }
+
+  function openDetail(item){
+    applyState({
+      view: "detail",
+      category: state.activeCategory,
+      subcategory: state.activeSubcategory,
+      itemId: itemId(item)
+    }, true);
+  }
+
+  window.addEventListener("popstate", function(e){
+    applyState(e.state || { view: "categories" }, false);
+  });
+
+  // ---------- Render: categories ----------
+  function renderCategories(){
+    if(state.categories.length === 0){
+      mainEl.innerHTML = '<div class="empty">No categories available yet. Check back soon.</div>';
+      return;
+    }
+    var sorted = state.categories.slice().sort(function(a,b){ return catPosition(a) - catPosition(b); });
+    var html = '<div class="cat-grid">';
+    sorted.forEach(function(c){
+      var name = catName(c);
+      if(!name) return;
+      html += '<a class="cat-card" data-cat="'+esc(name)+'">' +
+        imgTag(catUrl(c), name, "cat-thumb") +
+        '<div class="cat-label">'+esc(name)+'</div>' +
+      '</a>';
+    });
+    html += '</div>';
+    mainEl.innerHTML = html;
+    mainEl.querySelectorAll('[data-cat]').forEach(function(el){
+      el.addEventListener('click', function(){ openCategory(el.getAttribute('data-cat')); });
+    });
+  }
+
+  // ---------- Render: subcategories ----------
+  function renderSubcategories(subs){
+    if(subs.length === 0){
+      mainEl.innerHTML =
+        '<div class="section-title">'+esc(state.activeCategory)+'</div>' +
+        '<div class="empty">No subcategories found where CATEGORY = "'+esc(state.activeCategory)+'" in the Subcategories table.</div>';
+      return;
+    }
+    var html = '<div class="section-title">'+esc(state.activeCategory)+'</div><div class="cat-grid">';
+    subs.forEach(function(s){
+      var name = subCatName(s);
+      if(!name) return;
+      html += '<a class="cat-card" data-sub="'+esc(name)+'">' +
+        imgTag(subCatUrl(s), name, "cat-thumb") +
+        '<div class="cat-label">'+esc(name)+'</div>' +
+      '</a>';
+    });
+    html += '</div>';
+    mainEl.innerHTML = html;
+    mainEl.querySelectorAll('[data-sub]').forEach(function(el){
+      el.addEventListener('click', function(){
+        openSubcategoryProducts(state.activeCategory, el.getAttribute('data-sub'));
+      });
+    });
+  }
+
+  function isMeaningfulPrice(v){
+    if(v === null || v === undefined) return false;
+    var s = String(v).trim();
+    if(s === "") return false;
+    var num = parseFloat(s.replace(/[^0-9.\-]/g,""));
+    if(!isNaN(num) && num === 0) return false;
+    return true;
+  }
+
+  // Formats the numeric portion of a price string with thousands commas,
+  // while preserving any surrounding text (currency symbols, "UGX", etc).
+  function formatPriceDisplay(v){
+    if(v === null || v === undefined) return "";
+    var s = String(v).trim();
+    var match = s.match(/-?\d[\d,]*\.?\d*/);
+    if(!match) return s;
+    var numStr = match[0].replace(/,/g,"");
+    var parts = numStr.split(".");
+    var intPart = parts[0];
+    var neg = intPart.charAt(0) === "-";
+    if(neg) intPart = intPart.substring(1);
+    var withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if(neg) withCommas = "-" + withCommas;
+    var formattedNum = parts.length > 1 ? withCommas + "." + parts[1] : withCommas;
+    return s.slice(0, match.index) + formattedNum + s.slice(match.index + match[0].length);
+  }
+
+  // DISCOUNTED PRICE, when present and non-zero, IS the current/selling price.
+  // PRICE then becomes the "before discount" price shown struck through.
+  // If DISCOUNTED PRICE is absent or zero, PRICE is simply the current price (no discount shown).
+  function computePricing(it){
+    var price = itemPrice(it);
+    var disc = itemDiscounted(it);
+    var hasDiscount = isMeaningfulPrice(disc);
+    return {
+      current: hasDiscount ? disc : price,
+      original: price,
+      hasDiscount: hasDiscount
+    };
+  }
+
+  // ---------- Render: product grid ----------
+  function productCardHtml(it, idx){
+    var name = itemName(it);
+    var pricing = computePricing(it);
+    var negotiable = itemNegotiable(it);
+    var img = itemImage(it);
+
+    var html = '<a class="card" data-idx="'+idx+'">';
+    html += '<div class="card-img-wrap">';
+    if(pricing.hasDiscount) html += '<div class="badge-sale">SALE</div>';
+    html += imgTag(img, name);
+    html += '</div>';
+    html += '<div class="card-body">';
+    html += '<div class="card-name">'+esc(name)+'</div>';
+    html += '<div class="price-row">';
+    if(pricing.current !== null && pricing.current !== undefined && String(pricing.current).trim() !== ""){
+      var mainVal = pricing.hasDiscount ? pricing.original : pricing.current;
+      html += '<span class="price-tag">'+(isMeaningfulPrice(mainVal) ? esc(formatPriceDisplay(mainVal)) : "Ask price")+'</span>';
+      if(pricing.hasDiscount && isMeaningfulPrice(pricing.original)) html += '<span class="price-old">'+esc(formatPriceDisplay(pricing.current))+'</span>';
+    } else {
+      html += '<span class="price-tag" style="background:#EFEAD9;color:#8a8267;">Ask price</span>';
+    }
+    html += '</div>';
+    if(negotiable) html += '<div class="neg-tag">Negotiable</div>';
+    html += '</div></a>';
+    return html;
+  }
+
+  function renderProductGrid(products, titleOverride){
+    var title = titleOverride || "Products";
+    if(products.length === 0){
+      mainEl.innerHTML = '<div class="section-title">'+esc(title)+'</div><div class="empty">No products found here yet. Check back soon, or message us on WhatsApp.</div>';
+      return;
+    }
+    var html = '<div class="section-title">'+esc(title)+' ('+products.length+')</div><div class="grid">';
+    products.forEach(function(it, idx){
+      html += productCardHtml(it, idx);
+    });
+    html += '</div>';
+    mainEl.innerHTML = html;
+    mainEl.querySelectorAll('[data-idx]').forEach(function(el){
+      el.addEventListener('click', function(){
+        var idx = parseInt(el.getAttribute('data-idx'), 10);
+        openDetail(products[idx]);
+      });
+    });
+  }
+
+  // ---------- Render: detail ----------
+  function renderDetail(it){
+    var name = itemName(it);
+    var desc = itemDesc(it);
+    var pricing = computePricing(it);
+    var negotiable = itemNegotiable(it);
+    var img = itemImage(it);
+
+    var html = '<div class="detail">';
+    html += '<div class="detail-img" id="detailImgWrap">'+imgTag(img, name)+
+      (img ? '<div class="zoom-hint"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3c1-1.1 1.6-2.6 1.6-4.2C16 5.9 13.1 3 9.5 3S3 5.9 3 9.5 5.9 16 9.5 16c1.6 0 3.1-.6 4.2-1.6l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0C7 14 5 12 5 9.5S7 5 9.5 5 14 7 14 9.5 12 14 9.5 14z"/></svg>Tap to enlarge</div>' : '') +
+      '</div>';
+    html += '<div class="detail-name">'+esc(name)+'</div>';
+    html += '<div class="detail-price-row">';
+    if(pricing.current !== null && pricing.current !== undefined && String(pricing.current).trim() !== ""){
+      var mainVal = pricing.hasDiscount ? pricing.original : pricing.current;
+      html += '<span class="detail-price">'+(isMeaningfulPrice(mainVal) ? esc(formatPriceDisplay(mainVal)) : "Ask price")+'</span>';
+      if(pricing.hasDiscount && isMeaningfulPrice(pricing.original)) html += '<span class="detail-old">'+esc(formatPriceDisplay(pricing.current))+'</span>';
+    } else {
+      html += '<span class="detail-price" style="background:#EFEAD9;color:#8a8267;">Ask price</span>';
+    }
+    html += '</div>';
+    if(negotiable) html += '<div class="detail-neg">Price is negotiable</div>';
+    if(desc) html += '<div class="detail-desc">'+esc(desc)+'</div>';
+    html += '<button class="detail-wa" id="detailWaBtn">' +
+      '<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.1L2 22l5.1-1.3c1.4.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.2-8.4 8.2z"/></svg>' +
+      'Order on WhatsApp' +
+    '</button>';
+
+    var seller = findSeller(itemOwner(it));
+    if(seller){
+      var company = sellerCompany(seller);
+      var address = sellerAddress(seller);
+      var telephone = sellerTelephone(seller);
+      var poster = sellerPoster(seller);
+      var sellerPhone = normalizePhone(telephone);
+      html += '<div class="seller-card">';
+      if(poster) html += '<div class="seller-poster">'+imgTag(poster, company || "Seller")+'</div>';
+      html += '<div class="seller-body">';
+      html += '<div class="seller-label">Sold by</div>';
+      if(company) html += '<div class="seller-company">'+esc(company)+'</div>';
+      if(address) html += '<div class="seller-line">📍 '+esc(address)+'</div>';
+      if(telephone) html += '<div class="seller-line">📞 '+esc(telephone)+'</div>';
+      html += '<div class="seller-actions">';
+      if(sellerPhone) html += '<button class="seller-wa" id="sellerWaBtn">' +
+        '<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.1L2 22l5.1-1.3c1.4.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.2-8.4 8.2z"/></svg>' +
+        'Message Seller</button>';
+      if(sellerPhone) html += '<button class="seller-call" id="sellerCallBtn">Call Seller</button>';
+      html += '</div></div></div>';
+    } else if(itemOwner(it)){
+      // Item has an OWNER value but no row in Sellers matched it (phone_id mismatch or missing row)
+      html += '<div class="seller-card"><div class="seller-body">' +
+        '<div class="seller-label">Sold by</div>' +
+        '<div class="seller-line" style="color:var(--slate);">Seller details not available for this listing.</div>' +
+      '</div></div>';
+    }
+
+    html += '</div>';
+    mainEl.innerHTML = html;
+    var detailImgWrap = document.getElementById('detailImgWrap');
+    if(detailImgWrap && img){
+      detailImgWrap.addEventListener('click', function(){
+        openLightbox(img, name);
+      });
+    }
+    document.getElementById('detailWaBtn').addEventListener('click', function(){
+      window.open(waLink("Hello Bushenyi Online, I am interested in: " + name), "_blank");
+    });
+    if(seller){
+      var sellerPhoneNorm = normalizePhone(sellerTelephone(seller));
+      var waBtnEl = document.getElementById('sellerWaBtn');
+      if(waBtnEl) waBtnEl.addEventListener('click', function(){
+        window.open(waLink("Hello, I am interested in: " + name + " (via Bushenyi Online)", sellerPhoneNorm), "_blank");
+      });
+      var callBtnEl = document.getElementById('sellerCallBtn');
+      if(callBtnEl) callBtnEl.addEventListener('click', function(){
+        window.location.href = "tel:+" + sellerPhoneNorm;
+      });
+    }
+  }
+
+  // ---------- Render: search ----------
+  function renderSearch(term){
+    var t = term.trim().toLowerCase();
+    var results = state.items.filter(function(it){
+      var name = String(itemName(it) || "").toLowerCase();
+      var desc = String(itemDesc(it) || "").toLowerCase();
+      return name.indexOf(t) !== -1 || desc.indexOf(t) !== -1;
+    });
+    renderProductGrid(results, 'Results for "' + term + '"');
+  }
+
+  var searchDebounce = null;
+  searchInput.addEventListener('input', function(){
+    var val = searchInput.value;
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(function(){
+      if(!state.loaded) return;
+      if(val.trim() === ""){
+        goHome();
+        return;
+      }
+      applyState({ view: "search", searchTerm: val }, true);
+    }, 220);
+  });
+
+  // ---------- Boot ----------
+  renderLoading();
+  Promise.all([
+    loadTable("ITEMS"),
+    loadTable("CATEGORIES"),
+    loadTable("Subcategories"),
+    loadTable("Sellers")
+  ]).then(function(results){
+    state.items = Array.isArray(results[0]) ? results[0] : [];
+    state.categories = Array.isArray(results[1]) ? results[1] : [];
+    state.subcategories = Array.isArray(results[2]) ? results[2] : [];
+    state.sellers = Array.isArray(results[3]) ? results[3] : [];
+    state.loaded = true;
+    // Establish the base history entry (Home) without adding an extra back-stack step
+    history.replaceState({ view: "categories" }, "", "#categories");
+    applyState({ view: "categories" }, false);
+  }).catch(function(err){
+    renderError(err);
+  });
+
+})();
+</script>
+</body>
+</html>
