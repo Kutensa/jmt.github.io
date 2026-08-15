@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#10121c">
+<title>Bushenyi Online — Ishaka Town</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12130f; --paper:#faf7ef; --panel:#fff;
+  --navy:#10121c; --navy2:#1b2036;
+  --amber:#f2a916; --amber-ink:#5c3c02;
+  --forest:#1e6b4c;
+  --red:#d1453b;
+  --line:#e9e4d8;
+  --muted:#8a8578;
+  --radius:16px;
+  --safe-top: env(safe-area-inset-top,0px);
+  --safe-bottom: env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  overscroll-behavior-y:none;
+  max-width:560px; margin:0 auto;
+  position:relative;
+}
+h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+button{font-family:inherit}
+a{color:inherit}
+
+/* ---------- App bar ---------- */
+.appbar{
+  position:sticky; top:0; z-index:30;
+  background:linear-gradient(160deg,var(--navy),var(--navy2));
+  padding:calc(10px + var(--safe-top)) 16px 0;
+}
+.appbar-row{display:flex;align-items:center;gap:10px}
+.menu-btn{width:38px;height:38px;border:0;border-radius:11px;background:#ffffff14;color:#fff;font-size:18px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.wordmark{flex:1;line-height:1.05}
+.wordmark b{display:block;font-size:18px;font-weight:700;color:#fff;letter-spacing:.2px}
+.wordmark span{display:block;font-size:10.5px;color:var(--amber);font-weight:600;letter-spacing:1.4px;text-transform:uppercase;margin-top:1px}
+.icon-btn{width:38px;height:38px;border:0;border-radius:11px;background:#ffffff14;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.icon-btn.on{background:var(--amber);color:var(--navy)}
+
+.searchwrap{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.searchwrap.open{max-height:56px}
+.searchbar{display:flex;align-items:center;gap:8px;background:#ffffff14;border-radius:12px;margin:10px 0;padding:4px 4px 4px 12px}
+.searchbar input{flex:1;background:none;border:0;outline:0;color:#fff;padding:10px 0;font-size:14.5px}
+.searchbar input::placeholder{color:#ffffff80}
+.searchbar button{border:0;background:var(--amber);color:var(--navy);font-weight:700;font-size:13px;padding:9px 14px;border-radius:9px}
+
+/* marquee strip */
+.ticker{position:relative;overflow:hidden;background:var(--amber);margin-top:10px}
+.ticker-track{display:flex;gap:40px;white-space:nowrap;padding:6px 0;animation:scroll 16s linear infinite;width:max-content}
+.ticker span{font-size:11px;font-weight:700;color:var(--amber-ink);letter-spacing:.3px}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* category chips */
+.cats{
+  position:sticky; top:calc(64px + var(--safe-top)); z-index:25;
+  display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
+  background:var(--paper); padding:10px 16px; border-bottom:1px solid var(--line);
+}
+.cats::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto; white-space:nowrap; padding:7px 14px; border-radius:99px;
+  border:1.5px solid var(--line); background:var(--panel); font-size:12.5px; font-weight:600; color:var(--ink);
+}
+.chip.active{background:var(--ink); border-color:var(--ink); color:#fff}
+
+/* toolbar */
+.toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 4px}
+.count{font-size:11.5px;color:var(--muted);font-weight:600}
+.sortsel{font-size:11.5px;font-weight:600;border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 8px;color:var(--ink)}
+
+/* ---------- grid ---------- */
+main{padding:6px 16px 100px}
+.message{text-align:center;padding:50px 20px;color:var(--muted);font-size:13.5px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative}
+.card:active{transform:scale(.98)}
+.pic{aspect-ratio:1/1;background:#f0ede3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic .ph{font-size:10px;color:var(--muted);font-weight:600}
+.status-pill{position:absolute;top:8px;left:8px;background:#ffffffee;color:var(--forest);font-size:8.5px;font-weight:700;padding:3px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px}
+.cbody{padding:9px 10px 12px}
+.sub{font-size:8.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.cname{font-size:12.5px;font-weight:600;margin:3px 0 8px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.3em}
+
+/* price tag signature */
+.tag{
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--ink); color:#fff; border-radius:5px 8px 8px 5px;
+  padding:4px 8px 4px 6px; position:relative; transform:rotate(-1.2deg);
+}
+.tag::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--paper);border:1.5px solid #ffffff70;flex:0 0 auto}
+.tag b{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:700;letter-spacing:.2px}
+.tag .old{font-family:'IBM Plex Mono',monospace;text-decoration:line-through;color:#ffffff70;font-size:9px;margin-right:2px}
+.row-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:6px}
+.sale-badge{background:var(--red);color:#fff;font-size:8px;font-weight:800;padding:3px 6px;border-radius:5px;letter-spacing:.3px}
+.neg{font-size:9px;color:var(--forest);font-weight:700}
+
+/* ---------- floating call button ---------- */
+.fab{
+  position:fixed; right:16px; bottom:calc(20px + var(--safe-bottom));
+  z-index:40; display:flex; align-items:center; gap:8px;
+  background:var(--forest); color:#fff; border:0; border-radius:99px;
+  padding:13px 18px 13px 14px; box-shadow:0 10px 24px #1e6b4c55; font-weight:700; font-size:12.5px;
+  max-width:calc(100% - 32px); left:auto;
+}
+.fab .dot{width:8px;height:8px;border-radius:50%;background:#8ff5c4;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ---------- bottom sheet detail ---------- */
+.sheet-scrim{position:fixed;inset:0;background:#0009;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-scrim.show{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:51;
+  max-width:560px; margin:0 auto;
+  background:var(--panel); border-radius:22px 22px 0 0;
+  max-height:88vh; overflow-y:auto;
+  transform:translateY(100%); transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  padding-bottom:calc(24px + var(--safe-bottom));
+}
+.sheet.show{transform:translateY(0)}
+.grabber{width:38px;height:4px;border-radius:4px;background:var(--line);margin:10px auto 4px}
+.sheet-close{position:absolute;right:12px;top:12px;width:32px;height:32px;border:0;border-radius:50%;background:#00000010;font-size:18px;z-index:2}
+.sheet-img{width:100%;aspect-ratio:1/1;background:#f0ede3;overflow:hidden}
+.sheet-img img{width:100%;height:100%;object-fit:contain}
+.sheet-body{padding:16px 18px 4px}
+.sheet-body .sub{font-size:9.5px}
+.sheet-body h2{font-size:19px;margin:4px 0 10px;line-height:1.25}
+.dprice{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dprice b{font-family:'IBM Plex Mono',monospace;font-size:22px}
+.dprice .old{font-family:'IBM Plex Mono',monospace;text-decoration:line-through;color:var(--muted);font-size:13px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.badge{font-size:10px;font-weight:700;padding:5px 9px;border-radius:99px}
+.badge.neg{background:#e9f7f0;color:var(--forest)}
+.badge.status{background:#eef1f8;color:#33395c}
+.sheet-body p{font-size:13px;line-height:1.65;color:#3d3a34;white-space:pre-wrap;margin:0 0 16px}
+.order-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;background:var(--forest);color:#fff;font-weight:700;font-size:14px;padding:14px;border-radius:13px}
+
+.hidden{display:none!important}
+::selection{background:var(--amber);color:var(--navy)}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <div class="appbar-row">
+    <button class="icon-btn" aria-label="menu">☰</button>
+    <div class="wordmark"><b>Bushenyi Online</b><span>Ishaka Town Marketplace</span></div>
+    <button class="icon-btn" id="searchToggle" aria-label="search">🔍</button>
+  </div>
+  <div class="searchwrap" id="searchWrap">
+    <div class="searchbar">
+      <input id="q" placeholder="Search products…" type="search">
+      <button id="search">Go</button>
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-track">
+    <span>🚚&nbsp; FREE DELIVERY AROUND ISHAKA TOWN</span>
+    <span>📞&nbsp; CALL / WHATSAPP 0700495437</span>
+    <span>🏷️&nbsp; LOW PRICES YOU WON'T FIND ANYWHERE ELSE</span>
+    <span>🚚&nbsp; FREE DELIVERY AROUND ISHAKA TOWN</span>
+    <span>📞&nbsp; CALL / WHATSAPP 0700495437</span>
+    <span>🏷️&nbsp; LOW PRICES YOU WON'T FIND ANYWHERE ELSE</span>
+  </div></div>
+</div>
+
+<nav class="cats" id="cats"><button class="chip active" data-cat="ALL">All</button></nav>
+
+<div class="toolbar">
+  <b class="count" id="count">Loading…</b>
+  <select class="sortsel" id="sort">
+    <option value="recommended">Recommended</option>
+    <option value="low">Price ↑</option>
+    <option value="high">Price ↓</option>
+    <option value="name">Name A–Z</option>
+  </select>
+</div>
+
+<main>
+  <div id="message" class="message">Loading products…</div>
+  <section id="grid" class="grid"></section>
+</main>
+
+<a class="fab" href="tel:0700495437"><span class="dot"></span>📞 Call to order</a>
+
+<div class="sheet-scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="grabber"></div>
+  <button class="sheet-close" id="close">×</button>
+  <div class="sheet-img"><img id="dimg" alt=""></div>
+  <div class="sheet-body">
+    <div class="sub" id="dcat"></div>
+    <h2 id="dname"></h2>
+    <div class="dprice" id="dprice"></div>
+    <div class="badges" id="dbadges"></div>
+    <p id="ddesc"></p>
+    <a class="order-btn" href="tel:0700495437">📞 Call 0700495437 to order</a>
+  </div>
+</div>
+
+<script>
+const URL="https://eijfffonamfkkftodqjb.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamZmZm9uYW1ma2tmdG9kcWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyODk2MTEsImV4cCI6MjA3MTg2NTYxMX0.EvBkb5P16J4w19kVOuRVt7Cox-v3kWd8XkcscjgJRJo";
+const F='id,NAME,PRICE,"DISCOUNTED PRICE",NEGOTIABLE,STATUS,DESCRIPTION,SUBCATEGORY,URL';
+let items=[],selected="ALL";
+
+const $=x=>document.getElementById(x);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=x=>{let n=Number(String(x??"").replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:Infinity};
+const money=x=>{if(x==null||String(x).trim()==="")return"";let n=num(x);return n===Infinity?String(x):n.toLocaleString()};
+const api=async path=>{let r=await fetch(URL+"/rest/v1/"+path,{headers:{apikey:KEY,Authorization:"Bearer "+KEY}});if(!r.ok)throw Error(await r.text());return r.json()};
+
+async function loadCategories(){
+  const rows=await api("ITEMS?select=SUBCATEGORY");
+  const cats=[...new Set(rows.map(x=>String(x.SUBCATEGORY??"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  $("cats").innerHTML='<button class="chip active" data-cat="ALL">All</button>'+cats.map(c=>`<button class="chip" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>selectCategory(b.dataset.cat));
+}
+async function loadItems(){
+  $("message").classList.remove("hidden"); $("message").textContent="Loading products…";
+  $("grid").innerHTML="";
+  let path=`ITEMS?select=${encodeURIComponent(F)}`;
+  if(selected!=="ALL") path+=`&SUBCATEGORY=eq.${encodeURIComponent(selected)}`;
+  try{
+    items=await api(path);
+    apply();
+  }catch(e){$("message").textContent="Unable to load products. Check Supabase RLS and network access.";console.error(e)}
+}
+function selectCategory(c){
+  selected=c;
+  document.querySelectorAll(".chip").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));
+  $("q").value="";
+  loadItems();
+}
+function apply(){
+  let q=$("q").value.trim().toLowerCase();
+  let a=items.filter(x=>!q||`${x.NAME??""} ${x.DESCRIPTION??""}`.toLowerCase().includes(q));
+  let s=$("sort").value;
+  if(s==="low")a.sort((x,y)=>num(x["DISCOUNTED PRICE"]||x.PRICE)-num(y["DISCOUNTED PRICE"]||y.PRICE));
+  if(s==="high")a.sort((x,y)=>num(y["DISCOUNTED PRICE"]||y.PRICE)-num(x["DISCOUNTED PRICE"]||x.PRICE));
+  if(s==="name")a.sort((x,y)=>String(x.NAME??"").localeCompare(String(y.NAME??"")));
+  $("count").textContent=`${a.length} item${a.length===1?"":"s"}${selected!=="ALL"?" · "+selected:""}`;
+  $("message").classList.toggle("hidden",a.length>0);
+  if(!a.length){$("message").textContent="No products found in this category.";return}
+  $("grid").innerHTML=a.map((p,i)=>{
+    let sale=p["DISCOUNTED PRICE"], has=sale&&p.PRICE&&num(sale)<num(p.PRICE);
+    return `<article class="card" data-i="${i}">
+      <div class="pic">${p.URL?`<img src="${esc(p.URL)}" loading="lazy" onerror="this.style.display='none'">`:'<span class="ph">No image</span>'}
+        ${p.STATUS?`<span class="status-pill">${esc(p.STATUS)}</span>`:""}
+      </div>
+      <div class="cbody">
+        <div class="sub">${esc(p.SUBCATEGORY||"")}</div>
+        <div class="cname">${esc(p.NAME||"Unnamed product")}</div>
+        <div class="row-bottom">
+          <span class="tag">${has?`<span class="old">${esc(money(p.PRICE))}</span>`:""}<b>${esc(money(has?sale:p.PRICE))}</b></span>
+          ${has?'<span class="sale-badge">SALE</span>':(/^(yes|true)$/i.test(String(p.NEGOTIABLE??""))?'<span class="neg">Negotiable</span>':"")}
+        </div>
+      </div>
+    </article>`
+  }).join("");
+  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>openDetail(a[Number(c.dataset.i)]));
+}
+function openDetail(p){
+  $("dimg").src=p.URL||"";$("dimg").style.display=p.URL?"block":"none";
+  $("dcat").textContent=p.SUBCATEGORY||"";$("dname").textContent=p.NAME||"Unnamed product";
+  let sale=p["DISCOUNTED PRICE"],has=sale&&p.PRICE&&num(sale)<num(p.PRICE);
+  $("dprice").innerHTML=has?`<span class="old">${esc(money(p.PRICE))}</span><b>${esc(money(sale))}</b>`:`<b>${esc(money(p.PRICE))}</b>`;
+  let badges="";
+  if(/^(yes|true)$/i.test(String(p.NEGOTIABLE??""))) badges+='<span class="badge neg">Negotiable</span>';
+  if(p.STATUS) badges+=`<span class="badge status">${esc(p.STATUS)}</span>`;
+  $("dbadges").innerHTML=badges;
+  $("ddesc").textContent=p.DESCRIPTION||"";
+  $("scrim").classList.add("show");$("sheet").classList.add("show");
+  document.body.style.overflow="hidden";
+}
+function closeDetail(){
+  $("scrim").classList.remove("show");$("sheet").classList.remove("show");
+  document.body.style.overflow="";
+}
+$("search").onclick=apply;$("q").oninput=apply;$("sort").onchange=apply;
+$("close").onclick=closeDetail;$("scrim").onclick=closeDetail;
+$("searchToggle").onclick=()=>{$("searchWrap").classList.toggle("open");$("searchToggle").classList.toggle("on");if($("searchWrap").classList.contains("open"))$("q").focus()};
+
+loadCategories().then(loadItems).catch(e=>{$("message").textContent="Unable to load categories.";console.error(e)});
+</script>
+</body>
+</html>
